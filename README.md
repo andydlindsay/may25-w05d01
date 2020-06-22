@@ -5,10 +5,14 @@
 - [x] The Relational Data Model (Tables, Columns, Rows)
 - [x] `SELECT` Statements
 - [x] Filtering and ordering
-- [ ] Joining tables
-- [ ] Grouping records
-- [ ] Aggregation functions
-- [ ] `LIMIT` and `OFFSET`
+- [x] Joining tables
+- [x] Grouping records
+- [x] Aggregation functions
+- [x] `LIMIT` and `OFFSET`
+
+### SQL Differences
+* SQL is a standard
+* SQL Server, Postgres, MySQL, SQLite, T-SQL, Oracle
 
 ### Databases
 * Save and retrieve data
@@ -108,36 +112,63 @@ For the rest of the queries, we'll be using the `albums` and `songs` tables.
 7. List all albums along with their songs
 
 ```sql
-
+SELECT *
+FROM songs
+JOIN albums ON albums.id = album_id;
 ```
+
 8. List all albums along with how many songs each album has
 
 ```sql
+SELECT album_name, COUNT(songs.*)
+FROM songs
+JOIN albums ON albums.id = album_id
+GROUP BY album_name;
 
+-- use an alias!
+SELECT album_name, COUNT(songs.*) AS num_songs
+FROM songs
+JOIN albums ON albums.id = album_id
+GROUP BY album_name;
 ```
 
 9. Enhance previous query to only include albums that have more than 10 songs
 
 ```sql
-
+SELECT album_name, COUNT(songs.*) AS num_songs
+FROM songs
+JOIN albums ON albums.id = album_id
+GROUP BY album_name
+HAVING COUNT(songs.*) > 10;
 ```
 
 10. List ALL albums in the database, along with their songs if any
 
 ```sql
-
+SELECT album_name, song_name
+FROM albums
+LEFT JOIN songs ON albums.id = album_id;
 ```
 
 11. List albums along with average song rating
 
 ```sql
-
+SELECT album_name, ROUND(AVG(songs.rating) * 1000) / 1000 AS avg_rating
+FROM albums
+LEFT JOIN songs ON albums.id = album_id
+GROUP BY album_name;
 ```
 
 12. List albums and songs with rating higher than album average
 
 ```sql
-
+SELECT album_name,
+  song_name,
+  rating,
+  (SELECT AVG(rating) FROM songs WHERE songs.album_id = albums.id) AS album_avg_rating
+FROM albums
+JOIN songs ON albums.id = album_id
+WHERE rating > (SELECT AVG(rating) FROM songs WHERE songs.album_id = albums.id);
 ```
 
 ### Useful Links
